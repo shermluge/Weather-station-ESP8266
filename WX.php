@@ -18,7 +18,6 @@ $pressRate = 0.0;
 
 date_default_timezone_set("America/Los_Angeles");
 $TimeStamp = date("Y/m/d H:i:s");
-//file_put_contents('data.html', $TimeStamp, FILE_APPEND);
    if( $_REQUEST["TempF"] ){
       echo " The Temp is: ". $_REQUEST['TempF']. " F<br />";
       echo " The Temp is: ". $_REQUEST['TempC']. " C<br />";
@@ -40,13 +39,6 @@ $tempBmp = $_REQUEST['tempBmp'];
 $volt = $_REQUEST['volt'];
 $light = $_REQUEST['light'];
 $windspeed = $_REQUEST['windspeed'];
-//if($humidity =="nan"){
-//    $tempF=0;
-//    $tempC=0;
-//    $tempFi=0;
-//    $tempCi=0;
-//    $humidity=0;
-//}
 
 if($tempF != "nan"){
     $WriteMyRequest=  $TimeStamp. "," . $tempF . "," . $tempC .",". $tempFi .",". $tempCi . "," . $humidity 
@@ -75,7 +67,6 @@ for($i=12;$i>=1;$i--){
 	$line[$i] = $file[count($file) - $i];
 	$line = $file[count($file) - $i];
 	$pieces = explode(",", $line);
-	//$pressInches = number_format($pieces[6] * 0.0002952998,4);
 	$avg= $avg + $pieces[6];
 }
 
@@ -83,8 +74,6 @@ $avg=$avg/12;
 $var_string =  $TimeStamp ."," . $tempF . "~" . $avg . "," . $pressRate . "!" . $prevPress .",". $pieces[6]. "," . $i. "\n";
 file_put_contents($fileout, $var_string, FILE_APPEND | LOCK_EX);
 
-//INSERT INTO `wx` (`id`, `location`, `date`, `tempf`, `tempfi`, `tempc`, `tempci`, `TempBmpC`, `humidity`, `wind`, `pressure`) 
-//VALUES (NULL, 'BackYard', CURRENT_TIMESTAMP, '32', '32', '0', '0', '-.5', '70', '22', '24.8');
 
 //////Start of SQL///////
 $servername = "mysql.hostinger.com";
@@ -98,14 +87,16 @@ $conn = new mysqli($servername, $username, $password, $dbname);
 if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 } 
-$sql = "INSERT INTO `wx` (`id`, `location`, `date`, `tempf`, `tempc`, `tempfi`, `tempci`, `humidity`, `pressure`, `TempBmpC`, `windspeed`, `windDir`,`volt`,`light`) VALUES (NULL, 'BackYard', CURRENT_TIMESTAMP, '$tempF', '$tempC', '$tempFi', '$tempCi', '$humidity', '$pressure', '$tempBmp', '$windspeed','0','$volt','$light')";
+$sql = "INSERT INTO `wx` (`id`, `location`, `date`, `tempf`, `tempc`, `tempfi`, `tempci`, `humidity`, `pressure`, 
+`TempBmpC`, `windspeed`, `windDir`,`volt`,`light`) 
+VALUES (NULL, 'BackYard', CURRENT_TIMESTAMP, '$tempF', '$tempC', '$tempFi', '$tempCi', '$humidity', '$pressure', 
+'$tempBmp', '$windspeed','0','$volt','$light')";
 
 if ($conn->query($sql) === TRUE) {
     echo "New record created successfully";
 } else {
     echo "Error: " . $sql . "<br>" . $conn->error;
 }
-
 $conn->close();
 //////end of SQL///////
 
