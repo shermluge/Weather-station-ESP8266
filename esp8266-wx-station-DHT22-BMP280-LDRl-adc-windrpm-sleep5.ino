@@ -101,9 +101,6 @@ void loop() {
   kphWindSpeed = getWindSpeed();
   delay(10);
   digitalWrite(windSpeedSensorOnOff,LOW);
-  //delay(1000);
-  //digitalWrite(testPin,LOW);
-  //digitalWrite(testPin,LOW);
   readBmp280(); //must be before postData();
   /////ads1115////////////////////////////////
   int16_t adc0,adc1;
@@ -120,9 +117,6 @@ void loop() {
   Serial.print("AIN1: ");  Serial.println(adc1);
   //////////////////////////////////////////////////////
   postData();
-  //WiFi.forceSleepBegin(20000);
-  //WiFi.forceSleepWake();
-  //WiFi.forceSleepBegin(uint32 sleepUs = 60000);
   Serial.println("Going into deep sleep for 20 seconds");
   digitalWrite(led,turn_off);
   //ESP.deepSleep(60e6); // 20e6 is 20 seconds, 60e6 is 1 min.
