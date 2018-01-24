@@ -25,6 +25,7 @@
  * and wind chill function
  * Updated 1-17-18 Added power on power off for windspeed, so its not just consuming power
  * during sleep.
+ * Updated 1-24-18 Added this file to github
  */
 
 #include <ESP8266WiFi.h>
