@@ -52,15 +52,7 @@ $paddingBuff=0;
 	$conn->close();
 	
 ///////////////////////////////////////////////////////////////
-///  ATTENTION: MODIFIES HUMIDITY DUE TO CALIBRATION WITH DHT22
-	//$pieces[5]=$pieces[5]+10;
-	//if($pieces[5]>100)$pieces[5]=100;
-///  
-///////////////////////////////////////////////////////////////
-//	$timeRecorded = explode(" ",pieces[0]);
-//	$zTime = explode(":", timeRecorded[1]);
-//	$zDate = explode("\/", )
-	//echo "KFUK " .  000000KT 10SM "
+
 	$number = range(110000,1,7.1428);
 	$test=.001;
    $test=($number[130])/100;
@@ -76,10 +68,6 @@ $paddingBuff=0;
     	}else {
     		$lux = number_format($lux = mapNumber($light,900,19000,1000,0),0);
     	}
-	//$circ = .0011938052;
-	//$circ = .0007539862;
-	//$rpm = (($revolutions/2)/6)*60; //maxTime is 5
-    //$kph = $rpm * $circ *60;
 	
 	//works much better and is actual math..
 	$circ=97.34; //centimeters for 1 revolution
@@ -97,11 +85,7 @@ $paddingBuff=0;
 	<td align=center>" . $humidity . " %</td><td align=center>" . $pressInches . " in</td><td align=center>$cloudBase</td>
 	<td align=center>$lux</td><td>" . $mph . "</td></tr></table>
 	</p></span><br>Last 24 hrs of readings(12 Measures per hour)<br>Agerage Temps:<br>\n";    
-	/*echo "<style>
-	
-	table, td, th {
-    border: 1px solid black;
-}*/
+
 	echo "<style>
 	
 	td, th {
@@ -150,8 +134,6 @@ th {
 	$result = $conn->query($sql);
 	$prevHour = 99;
 	if ($result->num_rows > 0) {
-		//echo "<table><tr><th>Date</th><th>Light</th><th>Humidity</th></tr>";
-		// output data of each row
 		$totalHours=0;
 		while($row = $result->fetch_assoc()) {
 			$newDate=date("m/d/Y H:i:s ", strtotime('-8 hours', strtotime($row["date"])));
@@ -169,19 +151,16 @@ th {
 			}else if($row["humidity"] != 0 ){
 				$counttmp++;
 				$avg=$avg+$row["tempf"];
-			}
-			//echo "<tr><td>".$newDate. "</td><td>".$newHour. "</td><td>".$row["light"]."</td><td>".$row["humidity"]."</td></tr>";
+			}			
 		}
 		if($counttmp>0){
 			$avg=$avg/$counttmp;
 			$value[$totalHours]=number_format($avg,2);	
 			$blockHours[$totalHours]=$newHour;
-		}
-			//echo "</table>";
+		}			
 	} else {
 		echo "0 results";
 	}
-	//echo "<br>total hours: ".$totalHours."<br>";
 	for($i=0;$i<$totalHours;$i++){
 		echo "<table style=background:linear-gradient(-360deg,blue,yellow);width:42px;height:";
 		echo ($value[$i] * 5) + $paddingBuff;
@@ -256,14 +235,9 @@ th {
         echo "px\"><td valign=\"bottom\";>";
         echo $blockHours[$i] . "</td>";
         echo "</tr></table>\n";
-	}
-	//echo "</td></tr></table>";
-	$conn->close();
-	
-	echo "<br><br><br>";
-    //echo "<span style=\"font-size: 100%\">";
-	//echo "<p class=\"highlight\">24 Hour index</p>";
-	//echo "</span>";
+	}	
+	$conn->close();	
+	echo "<br><br><br>"; 
 //////End HUMIDITY/////////////////////////////////////////////////////////////////////
 
 
@@ -287,9 +261,7 @@ th {
 	$counttmp=0;
 	$totalHours=0;
 	$prevPress=0;
-	if ($result->num_rows > 0) {
-		//echo "<table><tr><th>Date</th><th>Light</th><th>Humidity</th></tr>";
-		// output data of each row
+	if ($result->num_rows > 0) {		
 		$totalHours=0;
 		while($row = $result->fetch_assoc()) {
 			$newDate=date("m/d/Y H:i:s ", strtotime('-8 hours', strtotime($row["date"])));
@@ -317,13 +289,11 @@ th {
 				
 			}else if ($row["humidity"] != 0 ){
 				$counttmp++;
-				$avg=$avg+$row["pressure"];
-				
+				$avg=$avg+$row["pressure"];				
 			}			
 		}
 		if($counttmp>0){
-			$avg=$avg/$counttmp;
-			//$avg = number_format($avg * 0.00031764553693764569533801318419059,2);
+			$avg=$avg/$counttmp;			
 			if($avg==$prevPress){
 				$pressRate = $same;
 			}else if ($avg > $prevPress){
@@ -516,15 +486,13 @@ th {
 			}else if($row["humidity"] != 0 ){
 				$counttmp++;
 				$avg=$avg+$row["windspeed"];
-			}
-			//echo "<tr><td>".$newDate. "</td><td>".$newHour. "</td><td>".$row["light"]."</td><td>".$row["humidity"]."</td></tr>";
+			}			
 		}
 		if($counttmp>0){
 			$avg=$avg/$counttmp;
 			$value[$totalHours]=number_format($avg,2);	
 			$blockHours[$totalHours]=$newHour;
 		}
-			//echo "</table>";
 	} else {
 		echo "0 results";
 	}
@@ -544,7 +512,6 @@ th {
         echo "</tr></table>\n";
 	}
 	$conn->close();
-
 ///////////////End of Wind////////////////////////////////////////////////
 
 echo "<br><br><br><br><br>Pascal:" .$currentPacal."<br>\n";
@@ -568,9 +535,7 @@ echo "<br> Updated 01/05/18 - converted to all mysql now.\n";
 echo "<br> Updated 01/22/18 - Added Lux and Wind graphs and fixed formating issues (still a few more to go).";
 echo "<br><a href=\"layout.jpg\">Layout photo</a>\n";
 echo "<br><a href=\"wxStation.jpg\">WX Station photo (prior to set up with case and wind speed)</a>\n";
-	
-	
-
-/////////////////////////////////////////////////////////////////////////////
 ?>
+/////////////////////////////////////////////////////////////////////////////
+
 </body></html>
