@@ -58,11 +58,10 @@ Adafruit_BMP280 bme; // I2C
 const char* hostGet = "shermluge.xyz"; //http://
 
 
-//const char* ssid = "EACorp";
-//const char* ssid = "sas-s7";
-const char* ssid = "peepsadmin";
-const char* password = "bitemyass";
-//const char* password = "Emp_CQ611";
+
+const char* ssid = "ssid";
+const char* password = "password";
+
 
 float ha = 0.0;
 float ta = 0.0;
