@@ -7,9 +7,9 @@
 ////////////////////////////////////////////////////////////
 date_default_timezone_set("America/Los_Angeles");
 $servername = "mysql.hostinger.com";
-$username = "mysql_username";
-$password = "password";
-$dbname = "db_name";
+$username = "user";
+$password = "pass";
+$dbname = "dbname";
 $paddingBuff=0;
 
    $same = 0;
@@ -33,7 +33,7 @@ $paddingBuff=0;
 			$currentPacal = number_format($row["pressure"],4);
 			$pressInches = number_format($row["pressure"] * 0.00031764553693764569533801318419059,4);
 			$tempAvg = ($row["tempc"]+$row["TempBmpC"])/2; //avg of both sensors.	
-			$dewPoint = $tempAvg-((100 -($humidity))/5);
+			$dewPoint = number_format($tempAvg-((100 -($humidity))/5),2);
 			$newDate=date("m/d/Y H:i:s ", strtotime('-8 hours', strtotime($row["date"])));
 			$volt=$row["volt"];
 			echo "Last Reading: <p style=\"font-size: 140%\">" . $newDate . "</p>"; // piece1
@@ -52,7 +52,15 @@ $paddingBuff=0;
 	$conn->close();
 	
 ///////////////////////////////////////////////////////////////
-
+///  ATTENTION: MODIFIES HUMIDITY DUE TO CALIBRATION WITH DHT22
+	//$pieces[5]=$pieces[5]+10;
+	//if($pieces[5]>100)$pieces[5]=100;
+///  
+///////////////////////////////////////////////////////////////
+//	$timeRecorded = explode(" ",pieces[0]);
+//	$zTime = explode(":", timeRecorded[1]);
+//	$zDate = explode("\/", )
+	//echo "KFUK " .  000000KT 10SM "
 	$number = range(110000,1,7.1428);
 	$test=.001;
    $test=($number[130])/100;
@@ -68,6 +76,10 @@ $paddingBuff=0;
     	}else {
     		$lux = number_format($lux = mapNumber($light,900,19000,1000,0),0);
     	}
+	//$circ = .0011938052;
+	//$circ = .0007539862;
+	//$rpm = (($revolutions/2)/6)*60; //maxTime is 5
+    //$kph = $rpm * $circ *60;
 	
 	//works much better and is actual math..
 	$circ=97.34; //centimeters for 1 revolution
@@ -84,8 +96,14 @@ $paddingBuff=0;
 	<tr><td align=center>".$tempAvgF . " F</td><td align=center>" . $tempAvgD . " F</td><td align=center>$tempSpread</td>
 	<td align=center>" . $humidity . " %</td><td align=center>" . $pressInches . " in</td><td align=center>$cloudBase</td>
 	<td align=center>$lux</td><td>" . $mph . "</td></tr></table>
-	</p></span><br>Last 24 hrs of readings(12 Measures per hour)<br>Agerage Temps:<br>\n";    
-
+	</p></span><br>Last 24 hrs of readings(12 Measures per hour)<br>\n";
+	  
+	//class=\"highlight\" class=\"bold\ style=\"font-size: 140%\"
+	/*echo "<style>
+	
+	table, td, th {
+    border: 1px solid black;
+}*/
 	echo "<style>
 	
 	td, th {
@@ -106,6 +124,8 @@ th {
     height: 50px;
 }
 </style>\n";
+    echo "<hr>
+    <font size=\"+2\">Agerage Temps:</font><br>\n"; 
 	echo "<table style=\"font-size: 10%\">\n";
 	$value=NULL;
 	$valueh=NULL;
@@ -134,6 +154,8 @@ th {
 	$result = $conn->query($sql);
 	$prevHour = 99;
 	if ($result->num_rows > 0) {
+		//echo "<table><tr><th>Date</th><th>Light</th><th>Humidity</th></tr>";
+		// output data of each row
 		$totalHours=0;
 		while($row = $result->fetch_assoc()) {
 			$newDate=date("m/d/Y H:i:s ", strtotime('-8 hours', strtotime($row["date"])));
@@ -151,16 +173,19 @@ th {
 			}else if($row["humidity"] != 0 ){
 				$counttmp++;
 				$avg=$avg+$row["tempf"];
-			}			
+			}
+			//echo "<tr><td>".$newDate. "</td><td>".$newHour. "</td><td>".$row["light"]."</td><td>".$row["humidity"]."</td></tr>";
 		}
 		if($counttmp>0){
 			$avg=$avg/$counttmp;
 			$value[$totalHours]=number_format($avg,2);	
 			$blockHours[$totalHours]=$newHour;
-		}			
+		}
+			//echo "</table>";
 	} else {
 		echo "0 results";
 	}
+	//echo "<br>total hours: ".$totalHours."<br>";
 	for($i=0;$i<$totalHours;$i++){
 		echo "<table style=background:linear-gradient(-360deg,blue,yellow);width:42px;height:";
 		echo ($value[$i] * 5) + $paddingBuff;
@@ -181,7 +206,7 @@ th {
 
 	////////////Humidity//////////////////////////////////////////////////
 	// Create connection
-	echo "<br><br><br>Humidity:<br>";
+	echo "<br><br><hr><br><font size=\"+2\">Humidity:</font><br>";
 	$conn = new mysqli($servername, $username, $password, $dbname);
 	// Check connection
 	if ($conn->connect_error) {
@@ -235,9 +260,14 @@ th {
         echo "px\"><td valign=\"bottom\";>";
         echo $blockHours[$i] . "</td>";
         echo "</tr></table>\n";
-	}	
-	$conn->close();	
-	echo "<br><br><br>"; 
+	}
+	//echo "</td></tr></table>";
+	$conn->close();
+	
+	echo "<br><br><br>";
+    //echo "<span style=\"font-size: 100%\">";
+	//echo "<p class=\"highlight\">24 Hour index</p>";
+	//echo "</span>";
 //////End HUMIDITY/////////////////////////////////////////////////////////////////////
 
 
@@ -261,7 +291,9 @@ th {
 	$counttmp=0;
 	$totalHours=0;
 	$prevPress=0;
-	if ($result->num_rows > 0) {		
+	if ($result->num_rows > 0) {
+		//echo "<table><tr><th>Date</th><th>Light</th><th>Humidity</th></tr>";
+		// output data of each row
 		$totalHours=0;
 		while($row = $result->fetch_assoc()) {
 			$newDate=date("m/d/Y H:i:s ", strtotime('-8 hours', strtotime($row["date"])));
@@ -289,11 +321,13 @@ th {
 				
 			}else if ($row["humidity"] != 0 ){
 				$counttmp++;
-				$avg=$avg+$row["pressure"];				
+				$avg=$avg+$row["pressure"];
+				
 			}			
 		}
 		if($counttmp>0){
-			$avg=$avg/$counttmp;			
+			$avg=$avg/$counttmp;
+			//$avg = number_format($avg * 0.00031764553693764569533801318419059,2);
 			if($avg==$prevPress){
 				$pressRate = $same;
 			}else if ($avg > $prevPress){
@@ -308,7 +342,7 @@ th {
 	} else {
 		echo "0 results";
 	}
-	echo "<br>Pressure in last 24 hrs:<br>";
+	echo "<hr><br><font size=\"+2\">Pressure in last 24 hrs:</font><br>";
 	for($i=0;$i<$totalHours;$i++){
 		if($value[$i]>$prevAvg){
 			$upOrDown++;
@@ -318,14 +352,14 @@ th {
 		$prevAvg = $value[$i];
 		$avg = number_format($value[$i] * 0.00031764553693764569533801318419059,2);
 		echo "<table style=background:linear-gradient(-360deg,blue,red);width:42px;height:";
-		echo $upOrDown*10 +200;
+		echo $upOrDown*10 +220;
 		echo "px;background-color:red;border-collapse:collapse;display:inline-block;>
              <tr>
              <th style=width:42px;text-align:top;>";
         echo $avg;
         echo "</th></tr>
              <tr style=\"height:";
-        echo $upOrDown*10 + 180;
+        echo $upOrDown*10 + 200;
         echo "px\"><td valign=\"bottom\";>";
         echo $blockHours[$i] . "</td>";
         echo "</tr></table>\n";		
@@ -333,7 +367,7 @@ th {
 	$conn->close();
 /////////end of pressure/////////////////////////////////////////////////////////////////////////////////
 
-	echo "<br><br><br><br>Light in LUX:<br>";
+	echo "<br><br><br><hr><br><font size=\"+2\">Light in LUX:</font><br>";
 	$avg = 0;
 	$prevDay =0;
 	$dayDiff = 0;
@@ -486,17 +520,19 @@ th {
 			}else if($row["humidity"] != 0 ){
 				$counttmp++;
 				$avg=$avg+$row["windspeed"];
-			}			
+			}
+			//echo "<tr><td>".$newDate. "</td><td>".$newHour. "</td><td>".$row["light"]."</td><td>".$row["humidity"]."</td></tr>";
 		}
 		if($counttmp>0){
 			$avg=$avg/$counttmp;
 			$value[$totalHours]=number_format($avg,2);	
 			$blockHours[$totalHours]=$newHour;
 		}
+			//echo "</table>";
 	} else {
 		echo "0 results";
 	}
-	echo "<br><br><br><br>Wind Speed:<br>";
+	echo "<br><br><br><hr><br><font size=\"+2\">Wind Speed:</font><br>";
 	for($i=0;$i<$totalHours;$i++){
 		echo "<table style=background:linear-gradient(-360deg,gray,white);width:42px;height:";
 		echo ($value[$i]*5) + $paddingBuff;
@@ -512,9 +548,10 @@ th {
         echo "</tr></table>\n";
 	}
 	$conn->close();
+
 ///////////////End of Wind////////////////////////////////////////////////
 
-echo "<br><br><br><br><br>Pascal:" .$currentPacal."<br>\n";
+echo "<br><br><br><br><hr><br>Pascal:" .$currentPacal."<br>\n";
 	if($pressRate == $same){
 		echo "<br>Pressure since last hour staying the same<br>";
 	}else if($pressRate == $goingUp){
@@ -522,20 +559,27 @@ echo "<br><br><br><br><br>Pascal:" .$currentPacal."<br>\n";
 	}else{
 		echo "<br>Pressure since last hour going down, getting worse<br>";
 	}
-echo "<br>Rate of increase or decrease (24 max, -24 min), closer to 0 means not much change: " . $upOrDown . "\n";
+echo "<br>Rate of increase or decrease (24 max, -24 min), 
+closer to 0 means not much change:<font size=\"+2\"> " . $upOrDown . "</font>\n";
 if($upOrDown == 0){
 		echo "<br>24 hr Pressure staying the same<br>";
-	}else if($upOrDown > 0){
+	}else if($upOrDown > 0 && $upOrDown < 10){
 		echo "<br>24 hr Pressure going up, improving<br>";
+	}else if($upOrDown >= 10 && $pressRate == $goingUp){
+		echo "<br>24 hr Pressure going up, is greatly improving<br>";
+	}else if($upOrDown >= 10 && $pressRate != $goingUp){
+		echo "<br>24 hr Pressure going up, is greatly improving<br>";
 	}else{
 		echo "<br>24 hr Pressure going down, getting worse<br>";
 	}
-echo "<br>Total records recorded: " . $lastRecord . "<br>\n";
+echo "<hr><br>Total records recorded: " . $lastRecord . "<br>\n";
 echo "<br> Updated 01/05/18 - converted to all mysql now.\n";
 echo "<br> Updated 01/22/18 - Added Lux and Wind graphs and fixed formating issues (still a few more to go).";
-echo "<br><a href=\"layout.jpg\">Layout photo</a>\n";
+echo "<hr><br><a href=\"layout.jpg\">Layout photo</a>\n";
 echo "<br><a href=\"wxStation.jpg\">WX Station photo (prior to set up with case and wind speed)</a>\n";
-?>
-/////////////////////////////////////////////////////////////////////////////
+	
+	
 
+/////////////////////////////////////////////////////////////////////////////
+?>
 </body></html>
